@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 400px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff0055;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #e0004e;
+        }
+        .links {
+            margin-top: 10px;
+        }
+        .links a {
+            display: block;
+            color: #ff0055;
+            text-decoration: none;
+            margin: 5px 0;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        .back-to-home {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #191919;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .back-to-home:hover {
+            color: #ff0055;
+            transform: scale(1.1);
+        }
+
+        .back-to-home span {
+            color: #ff0055; /* Цвет звёздочки */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-to-home">PEONY<span>*</span></a>
+        <h1>Вход</h1>
+        <form id="loginForm">
+            <div id="error" class="error"></div>
+
+            <label for="country">Выберите страну</label>
+            <select id="country" required>
+                <option value="+375" data-length="9">Беларусь (+375)</option>
+                <option value="+7" data-length="10">Россия (+7)</option>
+                <option value="+380" data-length="9">Украина (+380)</option>
+                <option value="+1" data-length="10">США (+1)</option>
+            </select>
+
+            <label for="phone">Телефон</label>
+            <input type="tel" id="phone" placeholder="Введите номер телефона" required>
+
+            <label for="password">Пароль</label>
+            <input type="password" id="password" placeholder="Введите пароль" required>
+
+            <button type="submit">Войти</button>
+        </form>
+
+        <div class="links">
+            <a href="forgot-password.html">Забыли пароль?</a>
+            <a href="register.html">Нет аккаунта? Зарегистрироваться</a>
+        </div>
+    </div>
+
+    <script>
+        const countrySelect = document.getElementById('country');
+        const phoneInput = document.getElementById('phone');
+
+        // Обновление поля телефона при выборе страны
+        countrySelect.addEventListener('change', () => {
+            const selectedCountry = countrySelect.value;
+            phoneInput.value = selectedCountry;
+            phoneInput.setAttribute('maxlength', selectedCountry.length + parseInt(countrySelect.selectedOptions[0].dataset.length));
+        });
+
+        phoneInput.addEventListener('input', () => {
+            const selectedCountry = countrySelect.value;
+            if (!phoneInput.value.startsWith(selectedCountry)) {
+                phoneInput.value = selectedCountry;
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const phone = phoneInput.value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorDiv = document.getElementById('error');
+            const selectedLength = parseInt(countrySelect.selectedOptions[0].dataset.length);
+
+            // Проверка длины номера
+            if (phone.replace(countrySelect.value, '').length !== selectedLength) {
+                errorDiv.textContent = `Введите корректный номер телефона (${countrySelect.value}X${'X'.repeat(selectedLength)})`;
+                return;
+            }
+
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (user && user.phone === phone && user.password === password) {
+                alert('Вход выполнен успешно!');
+                window.location.href = "profile.html";
+            } else {
+                errorDiv.textContent = 'Неверный телефон или пароль!';
+            }
+        });
+
+        // Установка номера при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            countrySelect.dispatchEvent(new Event('change'));
+        });
+    </script>
+</body>
+</html>
